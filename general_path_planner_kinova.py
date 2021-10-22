@@ -10,8 +10,6 @@
 #
 # referenced: kinova_path_planning.py by Nuha Nishat
 
-#TODO: test with real kinova, update parameter lengths in arm_controller.py in infrastructure packages, upload this to github! 
-
 import rospy
 import sys, os
 import time
@@ -191,7 +189,7 @@ class MoveRobot():
 
         Input: list of joint values for each arm joint (list size of 7) or name of pre-determined state
         
-        possible state names:
+        current possible state names: (can add more in j2s7s300.srdf)
             - joint_values = "Home"
             - joint_values = "Vertical"
 
