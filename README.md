@@ -7,5 +7,5 @@ https://docs.google.com/document/d/1U_Y6YVRuo5g96acER3KHRvnXLiMlDnD1l2XDX_rjrJY/
 - Note: if *sudo apt-get install moveit** doesn't work, try *sudo apt install ros-$ROS_DISTRO-moveit*
 
 ## Change Robot Speed: (virtual or real world)
-- go to kinova-ros/kinova_moveit/robot_configs/j2s7s300_moveit_config/config
-- modify the joint velocity values in joint_limits.yaml file
+- go to *kinova-ros/kinova_moveit/robot_configs/j2s7s300_moveit_config/config*
+- modify the joint velocity values in *joint_limits.yaml*
