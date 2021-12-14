@@ -223,14 +223,14 @@ class MoveRobot():
         can be custom or basic meshes
         """
         # see examples
-        rospy.loginfo("Spawning collision models for path ".format(path))
+        rospy.loginfo("Spawning collision models for path {}".format(path))
 
     def teardown_env(self, path):
         """
         despawn collision models.
         """
         # see examples
-        rospy.loginfo("Despawning collision models for path ".format(path))
+        rospy.loginfo("Despawning collision models for path {}".format(path))
 
     def capture_joint_pose(self):
         """
