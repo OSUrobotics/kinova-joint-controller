@@ -1,12 +1,11 @@
 #! /usr/bin/env python
 
 # Author: Ryan Roberts
-# Email: roberyan@oregonstate.edu
-# Date: 10/21
+# Date: 12/21
 # 
-# script for capturing/executing joint poses on kinova arm either virtually or in real world.
-#
-# referenced: kinova_path_planning.py by Nuha Nishat
+# Example use case of general_path_planner_kinova.py with a custom path that spawns collision models
+# 
+# To run: ./custom_path_collisions.py 1 0/1/2 1 test.csv
 
 import rospy
 import sys, os, inspect
@@ -216,21 +215,6 @@ class MoveRobot():
             return True
         except:
             return False
-    
-    def build_env(self, path):
-        """
-        spawn collision models.
-        can be custom or basic meshes
-        """
-        # see examples
-        rospy.loginfo("Spawning collision models for path ".format(path))
-
-    def teardown_env(self, path):
-        """
-        despawn collision models.
-        """
-        # see examples
-        rospy.loginfo("Despawning collision models for path ".format(path))
 
     def capture_joint_pose(self):
         """
@@ -286,6 +270,111 @@ class MoveRobot():
                 self.go_to_finger_joint_state(next_gripper_joint_angles)
         self.joint_poses = []
 
+    def build_env(self, path):
+        """
+        spawn collision models.
+        can be custom or basic meshes
+        """
+        #example:
+        if path == 2:
+            wall_pose = PoseStamped()
+            wall_pose.header.frame_id = self.robot.get_planning_frame()
+            wall_pose.pose.position.x = 0.77
+            wall_pose.pose.position.y = 0.0
+            wall_pose.pose.position.z = 0.85
+            self.scene.add_box('drawer_face', wall_pose, (.01, 1.0, 1.0))
+            wall_pose = PoseStamped()
+            wall_pose.header.frame_id = self.robot.get_planning_frame()
+            wall_pose.pose.position.x = 0.60
+            wall_pose.pose.position.y = 0.0
+            wall_pose.pose.position.z = 0.86
+            self.scene.add_box('wall_b', wall_pose, (0.8, 0.5, 0.01))
+            wall_pose = PoseStamped()
+            wall_pose.header.frame_id = self.robot.get_planning_frame()
+            wall_pose.pose.position.x = 0.61
+            wall_pose.pose.position.y = -0.03
+            wall_pose.pose.position.z = 0.92
+            self.scene.add_box('wall_l', wall_pose, (0.3, 0.01, 0.2))
+            wall_pose = PoseStamped()
+            wall_pose.header.frame_id = self.robot.get_planning_frame()
+            wall_pose.pose.position.x = 0.61
+            wall_pose.pose.position.y = 0.08
+            wall_pose.pose.position.z = 0.92
+            self.scene.add_box('wall_r', wall_pose, (0.3, 0.01, 0.2))
+            wall_pose = PoseStamped()
+            wall_pose.header.frame_id = self.robot.get_planning_frame()
+            wall_pose.pose.position.x = 0.70
+            wall_pose.pose.position.y = 0.00
+            wall_pose.pose.position.z = 1.24
+            self.scene.add_box('wall_t', wall_pose, (0.1, 0.5, 0.01))
+
+        #update of path 1
+        elif path == 3:
+            self.scene.remove_world_object('wall_t')
+            wall_pose = PoseStamped()
+            wall_pose.header.frame_id = self.robot.get_planning_frame()
+            wall_pose.pose.position.x = 0.70 - .03
+            wall_pose.pose.position.y = 0.00
+            wall_pose.pose.position.z = 1.24
+            self.scene.add_box('wall_t', wall_pose, (0.1, 0.5, 0.01))
+            
+        #update of path 1
+        elif path == 4:
+            self.scene.remove_world_object('wall_t')
+            wall_pose = PoseStamped()
+            wall_pose.header.frame_id = self.robot.get_planning_frame()
+            wall_pose.pose.position.x = 0.70 - .05
+            wall_pose.pose.position.y = 0.00
+            wall_pose.pose.position.z = 1.24
+            self.scene.add_box('wall_t', wall_pose, (0.1, 0.5, 0.01))
+
+        #build safety walls
+        elif path == 5:
+            wall_pose = PoseStamped()
+            wall_pose.header.frame_id = self.robot.get_planning_frame()
+            wall_pose.pose.position.x = 0.43
+            wall_pose.pose.position.y = -0.53
+            wall_pose.pose.position.z = 1.21
+            self.scene.add_box('safety_l', wall_pose, (1.50, 0.01, 1.50)) 
+            wall_pose = PoseStamped()
+            wall_pose.header.frame_id = self.robot.get_planning_frame()
+            wall_pose.pose.position.x = 0.43
+            wall_pose.pose.position.y = 0.53
+            wall_pose.pose.position.z = 1.21
+            wall_pose = PoseStamped()
+            wall_pose.header.frame_id = self.robot.get_planning_frame()
+            wall_pose.pose.position.x = -0.33
+            wall_pose.pose.position.y = 0.22
+            wall_pose.pose.position.z = 1.21
+            self.scene.add_box('safety_b', wall_pose, (0.01, 1.50, 1.50)) 
+
+        else:
+            raise IOError("invalid path")
+
+    def teardown_env(self, path):
+        """
+        despawn collision models.
+        """
+
+        #example:
+        if path == 0:
+            self.scene.remove_world_object('drawer_face')
+        
+        elif path == 2:
+            self.scene.remove_world_object('drawer_face')
+            self.scene.remove_world_object('wall_l')
+            self.scene.remove_world_object('wall_r')
+            self.scene.remove_world_object('wall_b')
+            self.scene.remove_world_object('wall_t')
+
+        elif path == 3:
+            self.scene.remove_world_object('safety_l')
+            self.scene.remove_world_object('safety_r')
+            self.scene.remove_world_object('safety_b')
+        
+        else:
+            raise IOError("invalid path")
+
     def Run(self):
         """
         main function for executing user commands.
@@ -302,7 +391,75 @@ class MoveRobot():
 
             if(self.run_custom):
                 # write custom path here
-                rospy.loginfo('Running custom path')
+                
+                # example:
+                # spawn specific scene objects in rviz for collision aviodance, (self.build_env())
+                # use path planning for end-effector, (self.go_to_goal())
+                # write joint angles to csv file (self.write_joint_pose())
+                rospy.loginfo('opening the gripper')
+                self.go_to_finger_joint_state('Open')
+                rospy.loginfo("going to home state")
+                self.go_to_arm_joint_state("Home")
+                rospy.loginfo("finished going to home state")
+                self.write_joint_pose()
+
+                self.build_env(5)
+                rospy.loginfo("putting palm to handle [point 1 of 3]")
+                current_point = [0.594897268928, (-0.00552424651151 + 0.0275), 1.08080196315, -0.0552241400824, 0.998162456525, -0.0237767228365, -0.0075280931829]
+                self.go_to_goal(current_point)
+                self.write_joint_pose()
+                
+                rospy.loginfo("putting palm to handle [point 2 of 3]")
+                self.go_to_finger_joint_state([0.4, 0.4, 0.4])
+                current_point[0] = current_point[0] + .055
+                current_point[2] = current_point[2] - .08
+                self.go_to_goal(current_point)
+                self.write_joint_pose()
+                
+                rospy.loginfo("putting palm to handle [point 3 of 3]")
+                current_point[0] = current_point[0] + .055
+                current_point[2] = current_point[2] - .08 
+                self.go_to_goal(current_point)
+                self.teardown_env(0)
+                self.write_joint_pose()
+
+                rospy.loginfo("closing gripper")
+                self.go_to_finger_joint_state([1, 0.9, 0.9])
+                self.write_joint_pose()
+               
+                self.build_env(2)
+                rospy.loginfo("pulling drawer out [point 1 of 3]")
+                current_point[0] = current_point[0] - 0.04 
+                self.go_to_goal(current_point)
+                self.write_joint_pose()
+                
+                self.build_env(3)
+                rospy.loginfo("pulling drawer out [point 2 of 3]")
+                current_point[0] = current_point[0] - 0.04
+                self.go_to_goal(current_point)
+                self.write_joint_pose()
+                
+                self.build_env(4)
+                rospy.loginfo("pulling drawer out [point 3 of 3]")
+                current_point[0] = current_point[0] - 0.04
+                self.go_to_goal(current_point)
+                self.teardown_env(2)
+                self.write_joint_pose()
+
+                rospy.loginfo("releasing handle")
+                self.go_to_finger_joint_state([0.3, 0.3, 0.3])
+                self.write_joint_pose()
+               
+                rospy.loginfo("moving gripper from handle (test_point2)")
+                test_point = [ 0.55645217799, 0.0265633405959, 1.02602250364, -0.0552636649865, 0.998142031898, -0.0243654184542, -0.00804598493432]
+                self.go_to_goal(test_point)
+                self.write_joint_pose()
+               
+                rospy.loginfo("going to home state")
+                self.go_to_arm_joint_state("Home")
+                rospy.loginfo("finished")
+                self.teardown_env(3)
+                self.write_joint_pose()
 
             #capture joint poses on command
             else:
